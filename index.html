@@ -1,0 +1,306 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOKLOOP - Pass the Pages, Share the Knowledge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        },
+                        indigo: {
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-reader { font-family: 'Merriweather', serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-header {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+        }
+        .reader-sepia {
+            background-color: #fbf0d9;
+            color: #5f4b32;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
+
+    <header class="sticky top-0 z-30 glass-header border-b border-slate-800 shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20 gap-4">
+                
+                <!-- Logo & Slogans -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="resetAllFilters()">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 via-emerald-500 to-teal-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                        <i class="fa-solid fa-infinity text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl font-black tracking-tight bg-gradient-to-r from-brand-400 via-emerald-300 to-teal-200 bg-clip-text text-transparent">BOOKLOOP</span>
+                            <span class="text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30">v3.0</span>
+                        </div>
+                        <p class="text-[11px] font-medium text-slate-400 tracking-wide hidden sm:block">Pass the Pages, Share the Knowledge</p>
+                    </div>
+                </div>
+
+                <!-- Global Search Input -->
+                <div class="flex-1 max-w-xl mx-2">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search 80+ books by title, author, NCERT Class, or topic..." class="w-full pl-11 pr-10 py-2.5 text-sm bg-slate-800/90 border border-slate-700 rounded-2xl text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all shadow-inner">
+                        <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Header Action Badges -->
+                <div class="flex items-center space-x-3">
+                    <!-- Bookmarks Tab Button -->
+                    <button onclick="switchTab('bookmarks')" class="relative flex items-center space-x-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700/80 border border-slate-700/80 rounded-xl text-slate-200 text-xs font-semibold transition-all group">
+                        <i class="fa-solid fa-bookmark text-amber-400 group-hover:scale-110 transition-transform"></i>
+                        <span class="hidden md:inline">Bookmarks & Reading List</span>
+                        <span id="bookmarkCountBadge" class="bg-amber-500 text-slate-950 font-black text-[10px] px-2 py-0.5 rounded-full ml-1">0</span>
+                    </button>
+
+                    <!-- Studio Presentation Button -->
+                    <button onclick="openStudioModal()" class="hidden lg:flex items-center space-x-2 px-4 py-2.5 bg-indigo-600/90 hover:bg-indigo-600 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/30 transition-all transform active:scale-95">
+                        <i class="fa-solid fa-file-powerpoint text-indigo-200"></i>
+                        <span>Presentation Studio</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="relative bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 border-b border-slate-800/80 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div class="space-y-2 max-w-2xl">
+                    <span class="inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-brand-400 bg-brand-950/80 border border-brand-800/80 px-3 py-1 rounded-full">
+                        <i class="fa-solid fa-sparkles"></i>
+                        <span>Loop Into Infinite Knowledge</span>
+                    </span>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
+                        Your Gateway to <span class="bg-gradient-to-r from-brand-400 via-emerald-300 to-teal-200 bg-clip-text text-transparent">Second-Hand Books</span> & <span class="bg-gradient-to-r from-indigo-400 via-sky-300 to-cyan-200 bg-clip-text text-transparent">Free Digital Learning</span>
+                    </h1>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Buy pre-loved academic textbooks directly from fellow students or read full open-access digital e-books online with custom reading themes, bookmark notes, and citation tools.
+                    </p>
+                </div>
+
+                <!-- Quick Stats Box -->
+                <div class="grid grid-cols-3 gap-3 bg-slate-800/60 border border-slate-700/60 p-4 rounded-2xl backdrop-blur-md">
+                    <div class="text-center px-2">
+                        <span class="block text-xl font-extrabold text-brand-400">16+</span>
+                        <span class="text-[11px] text-slate-400 font-medium">Book Genres</span>
+                    </div>
+                    <div class="text-center px-2 border-x border-slate-700/60">
+                        <span class="block text-xl font-extrabold text-indigo-400">80+</span>
+                        <span class="text-[11px] text-slate-400 font-medium">Curated Titles</span>
+                    </div>
+                    <div class="text-center px-2">
+                        <span class="block text-xl font-extrabold text-amber-400">100%</span>
+                        <span class="text-[11px] text-slate-400 font-medium">Free Digital Readers</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-6">
+        
+        <!-- Main Filter Bar & Tabs -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+            <!-- View Mode Switcher -->
+            <div class="flex items-center space-x-1.5 bg-slate-800/90 p-1.5 rounded-2xl border border-slate-700/80 w-fit">
+                <button id="tab-all" onclick="switchTab('all')" class="px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all bg-brand-600 text-white shadow-md shadow-brand-500/20">
+                    <i class="fa-solid fa-layer-group mr-1.5"></i> All Books (<span id="count-all">0</span>)
+                </button>
+                <button id="tab-marketplace" onclick="switchTab('marketplace')" class="px-4 py-2 text-xs sm:text-sm font-semibold text-slate-400 hover:text-white rounded-xl transition-all">
+                    <i class="fa-solid fa-store mr-1.5"></i> Used Marketplace (<span id="count-marketplace">0</span>)
+                </button>
+                <button id="tab-digital" onclick="switchTab('digital')" class="px-4 py-2 text-xs sm:text-sm font-semibold text-slate-400 hover:text-white rounded-xl transition-all">
+                    <i class="fa-solid fa-book-open mr-1.5"></i> Free e-Library (<span id="count-digital">0</span>)
+                </button>
+                <button id="tab-bookmarks" onclick="switchTab('bookmarks')" class="px-4 py-2 text-xs sm:text-sm font-semibold text-slate-400 hover:text-white rounded-xl transition-all">
+                    <i class="fa-solid fa-bookmark text-amber-400 mr-1.5"></i> My Bookmarks (<span id="count-bookmarks">0</span>)
+                </button>
+            </div>
+
+            <!-- Sort By Selector -->
+            <div class="flex items-center space-x-3 text-xs text-slate-400">
+                <span class="font-medium">Sort Catalog:</span>
+                <select id="sortSelect" onchange="applyFilters()" class="bg-slate-800 border border-slate-700 text-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <option value="featured">Featured / Default</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="rating">Highest Reader Rating</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Horizontal Scrollable Category Bar -->
+        <div class="relative">
+            <div id="categoryContainer" class="flex items-center space-x-2 overflow-x-auto no-scrollbar py-2">
+                <!-- Dynamically populated categories -->
+            </div>
+        </div>
+
+        <!-- Active Category Badge -->
+        <div id="activeFilterBadge" class="hidden items-center gap-2 bg-brand-950/80 border border-brand-800 text-brand-300 px-3.5 py-1.5 rounded-xl text-xs w-fit shadow-sm">
+            <span>Filter Active: <strong id="filterName">Category</strong></span>
+            <button onclick="resetCategory()" class="hover:text-white ml-2 text-brand-400">
+                <i class="fa-solid fa-circle-xmark"></i>
+            </button>
+        </div>
+
+        <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Books rendered dynamically -->
+        </div>
+
+        <!-- Empty Results View -->
+        <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center space-y-4">
+            <div class="w-20 h-20 bg-slate-800 border border-slate-700 rounded-3xl flex items-center justify-center text-slate-500 text-3xl shadow-xl">
+                <i class="fa-solid fa-book-bookmark"></i>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-xl font-bold text-white">No books match your selection</h3>
+                <p class="text-sm text-slate-400 max-w-sm">Try searching for a different term or reset your category and search filters.</p>
+            </div>
+            <button onclick="resetAllFilters()" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-brand-500/20 transition-all">
+                Reset All Filters
+            </button>
+        </div>
+    </main>
+
+    <div id="readerModal" class="fixed inset-0 z-50 hidden bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
+        <div id="readerBox" class="bg-slate-900 border border-slate-800 w-full max-w-5xl h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden transition-colors duration-300">
+            
+            <!-- Reader Modal Top Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800/80 bg-slate-950/60">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2.5 bg-brand-500/10 text-brand-400 border border-brand-500/20 rounded-xl">
+                        <i class="fa-solid fa-book-open-reader text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 id="readerTitle" class="font-bold text-white text-base truncate max-w-xs sm:max-w-md">Book Title</h3>
+                        <p id="readerAuthor" class="text-xs text-slate-400">Author Name</p>
+                    </div>
+                </div>
+
+                <!-- Reader Customization Toolbar -->
+                <div class="flex items-center space-x-3">
+                    <!-- Text Size Controls -->
+                    <div class="hidden sm:flex items-center space-x-1 bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs">
+                        <button onclick="adjustTextSize(-2)" class="px-2 py-1 text-slate-300 hover:text-white font-bold" title="Decrease font size">A-</button>
+                        <span id="fontSizeDisplay" class="px-1.5 text-[11px] font-mono text-brand-400">16px</span>
+                        <button onclick="adjustTextSize(2)" class="px-2 py-1 text-slate-300 hover:text-white font-bold" title="Increase font size">A+</button>
+                    </div>
+
+                    <!-- Reader Theme Mode Buttons -->
+                    <div class="flex items-center space-x-1 bg-slate-800 p-1 rounded-xl border border-slate-700">
+                        <button onclick="setReaderTheme('dark')" class="px-2.5 py-1 text-xs rounded-lg font-medium text-slate-300 hover:text-white bg-slate-700" title="Dark Mode">Dark</button>
+                        <button onclick="setReaderTheme('sepia')" class="px-2.5 py-1 text-xs rounded-lg font-medium text-amber-900 bg-amber-100 hover:bg-amber-200" title="Sepia Mode">Sepia</button>
+                        <button onclick="setReaderTheme('light')" class="px-2.5 py-1 text-xs rounded-lg font-medium text-slate-900 bg-white hover:bg-slate-100" title="Light Mode">Light</button>
+                    </div>
+
+                    <!-- Close Modal Button -->
+                    <button onclick="closeReaderModal()" class="p-2 text-slate-400 hover:text-white rounded-xl">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Reader Main Content Frame -->
+            <div class="flex-1 overflow-y-auto p-6 sm:p-10 space-y-6 text-slate-200 font-reader leading-relaxed max-w-none" id="readerContent">
+                <!-- Chapter text populated dynamically -->
+            </div>
+
+            <!-- Reader Notes & Bookmark Bar -->
+            <div class="px-6 py-4 border-t border-slate-800/80 bg-slate-950/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div class="flex items-center space-x-3">
+                    <button id="readerBookmarkBtn" onclick="toggleCurrentBookBookmark()" class="px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-xl font-semibold flex items-center space-x-1.5 hover:bg-amber-500/20">
+                        <i class="fa-solid fa-bookmark"></i>
+                        <span id="readerBookmarkText">Bookmark Book</span>
+                    </button>
+                    <button onclick="generateCitation()" class="px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 rounded-xl font-semibold flex items-center space-x-1.5 hover:bg-indigo-500/20">
+                        <i class="fa-solid fa-quote-left"></i>
+                        <span>Cite Book</span>
+                    </button>
+                </div>
+
+                <!-- Chapter Stepper -->
+                <div class="flex items-center space-x-3 self-end sm:self-auto">
+                    <span id="readerProgress" class="text-slate-400 font-mono">Chapter 1 of 3</span>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="prevChapter()" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl font-semibold transition-colors">Previous</button>
+                        <button onclick="nextChapter()" class="px-3.5 py-1.5 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-semibold transition-colors">Next Chapter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="contactModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl shadow-2xl p-6 relative">
+            <button onclick="closeContactModal()" class="absolute right-5 top-5 text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 bg-brand-500/10 border border-brand-500/30 rounded-2xl flex items-center justify-center text-brand-400 text-2xl mx-auto">
+                    <i class="fa-solid fa-handshake"></i>
+                </div>
+                <h3 id="sellerBookTitle" class="font-bold text-white text-lg leading-snug">Contact Book Seller</h3>
+                <p id="sellerBookPrice" class="text-brand-400 font-extrabold text-2xl">₹0</p>
+            </div>
+
+            <div class="mt-6 space-y-4 text-sm">
+                <div class="bg-slate-800/80 border border-slate-700/80 p-4 rounded-2xl space-y-2.5">
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Seller Name:</span>
+                        <span id="sellerName" class="font-semibold text-slate-100">Rahul Sharma</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Campus / City:</span>
+                        <span id="sellerLocation" class="font-semibold text-slate-100">Kota, Rajasthan</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Book Condition:</span>
+                        <span id="sellerCondition" class="font-bold text-emerald-400">Like New</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <button onclick="showToast('Initiating call with seller... (+91 98765 43210)')" class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold flex items-center justify-center space-x-2 transition-all">
+                        <i class="fa-solid fa-phone"></i>
+
+                      
